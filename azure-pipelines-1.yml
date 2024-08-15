@@ -1,29 +1,54 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- main
+  branches:
+    include:
+      - main
 
-resources:
-- repo: self
+pr:
+  branches:
+    include:
+      - main
 
-variables:
-  tag: '$(Build.BuildId)'
+pool:
+  vmImage: ubuntu-latest
 
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'docker'
-        repository: 'kiranqot/azureTest'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        buildContext: 'https://gitlab.com/nanuchi/docker-in-1-hour.git'
+  - stage: CloneAndBuild
+    displayName: 'Clone Repository and Execute Tasks'
+    jobs:
+      - job: CloneAndExecute
+        steps:
+          - script: echo "Cloning repository from https://gitlab.com/nanuchi/docker-in-1-hour.git"
+            displayName: 'Display Repo URL'
+          
+          - script: |
+              git clone https://gitlab.com/nanuchi/docker-in-1-hour.git repo
+              cd repo
+              echo "Add other tasks to build, test, and deploy your project."
+              # Here you can add other git commands or any build/test/deploy scripts
+            displayName: 'Clone repository and execute tasks'
+
+  - stage: EchoStage
+    displayName: 'Additional Echo Scripts'
+    jobs:
+      - job: EchoJob
+        steps:
+          - script: echo "This is the first echo statement in the new stage."
+            displayName: 'Echo Script 1'
+
+          - script: echo "This is the second echo statement in the new stage."
+            displayName: 'Echo Script 2'
+
+  - stage: BuildDocker
+    displayName: 'Build and push Docker image'
+    jobs:
+    - job: Build
+      displayName: Build
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'docker'
+          repository: 'kiranqot/azuretest'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
