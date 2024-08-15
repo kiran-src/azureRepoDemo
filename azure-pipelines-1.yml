@@ -68,3 +68,18 @@ stages:
           - script: |
               echo "Docker image pushed successfully."
             displayName: 'Echo Success'
+
+
+  - stage: DockerRun
+    displayName: 'Install Docker and Run Container'
+    jobs:
+      - job: DockerJob
+        steps:
+          - script: |
+              echo "Running in Docker"
+              docker login --username kiranqot --password t3yL:JDjmTXKV4e
+            displayName: 'Running Docker Container'
+        # steps:
+        # - task: DockerInstaller@0
+        #   inputs:
+        #     dockerVersion: '17.09.0-ce'
