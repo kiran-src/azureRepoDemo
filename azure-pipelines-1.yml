@@ -26,3 +26,4 @@ stages:
         repository: 'kiranqot/azureTest'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
+        buildContext: 'https://gitlab.com/nanuchi/docker-in-1-hour.git'
