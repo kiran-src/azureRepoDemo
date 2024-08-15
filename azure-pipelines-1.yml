@@ -78,6 +78,7 @@ stages:
           - script: |
               echo "Running in Docker"
               docker login --username kiranqot --password t3yL:JDjmTXKV4e
+              docker run -d -p 3000:3000 kiranqot/azuretest
             displayName: 'Running Docker Container'
         # steps:
         # - task: DockerInstaller@0
