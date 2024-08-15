@@ -1,3 +1,8 @@
+parameters:
+  - name: repoUrl
+    type: string
+    default: 'https://gitlab.com/nanuchi/docker-in-1-hour.git'
+
 trigger:
   branches:
     include:
@@ -17,11 +22,11 @@ stages:
     jobs:
       - job: CloneAndExecute
         steps:
-          - script: echo "Cloning repository from https://gitlab.com/nanuchi/docker-in-1-hour.git"
+          - script: echo "Cloning repository from ${{ parameters.repoUrl }}"
             displayName: 'Display Repo URL'
           
           - script: |
-              git clone https://gitlab.com/nanuchi/docker-in-1-hour.git repo
+              git clone ${{ parameters.repoUrl }} repo
               cd repo
               echo "Add other tasks to build, test, and deploy your project."
               # Here you can add other git commands or any build/test/deploy scripts
@@ -38,17 +43,27 @@ stages:
           - script: echo "This is the second echo statement in the new stage."
             displayName: 'Echo Script 2'
 
-  - stage: BuildDocker
-    displayName: 'Build and push Docker image'
+  - stage: DockerBuildAndPush
+    displayName: 'Build and Push Docker Image'
     jobs:
-    - job: Build
-      displayName: Build
-      pool:
-        vmImage: ubuntu-latest
-      steps:
-      - task: Docker@2
-        inputs:
-          containerRegistry: 'docker'
-          repository: 'kiranqot/azuretest'
-          command: 'buildAndPush'
-          Dockerfile: '**/Dockerfile'
+      - job: DockerJob
+        steps:
+          - script: |
+              echo "Logging in to Docker Hub"
+              docker login --username kiranqot --password t3yL:JDjmTXKV4e
+            displayName: 'Docker Login'
+          
+          - script: |
+              echo "Building Docker image"
+              cd repo
+              docker build -t kiranqot/azuretest:latest .
+            displayName: 'Build Docker Image'
+
+          - script: |
+              echo "Pushing Docker image to Docker Hub"
+              docker push kiranqot/azuretest:latest
+            displayName: 'Push Docker Image to Docker Hub'
+
+          - script: |
+              echo "Docker image pushed successfully."
+            displayName: 'Echo Success'
