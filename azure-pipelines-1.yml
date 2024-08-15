@@ -55,6 +55,8 @@ stages:
           
           - script: |
               echo "Building Docker image"
+              git clone ${{ parameters.repoUrl }} repo2
+              cd repo2
               docker build -t kiranqot/azuretest:latest .
             displayName: 'Build Docker Image'
 
